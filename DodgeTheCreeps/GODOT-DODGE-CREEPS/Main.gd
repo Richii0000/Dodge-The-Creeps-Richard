@@ -1,34 +1,61 @@
 extends Node
 
 export(PackedScene) var mob_scene
-var score
+var score1 = 0
+var score2 = 0
+var alive1 = false
+var alive2 = false
 
 func _ready():
 	randomize()
 
+func new_game():
+	score1 = 0
+	score2 = 0
+	alive1 = true
+	alive2 = true
+	get_tree().call_group("mobs", "queue_free")
+	$Player1.start($StartPosition1.position)
+	$Player2.start($StartPosition2.position)
+	$StartTimer.start()
+	$HUD.update_score(score1, score2)
+	$HUD.show_message("Get Ready")
+	$Music.play()
+
+func _on_player_hit(player_id):
+	if player_id == 1:
+		alive1 = false
+	else:
+		alive2 = false
+
+	if not alive1 and not alive2:
+		game_over()
+
 func game_over():
 	$ScoreTimer.stop()
 	$MobTimer.stop()
-	$HUD.show_game_over()
 	$Music.stop()
 	$DeathSound.play()
 
-func new_game():
-	score = 0
-	$Player.start($StartPosition.position)
-	$StartTimer.start()
-	$HUD.update_score(score)
-	$HUD.show_message("Get Ready")
-	get_tree().call_group("mobs", "queue_free")
-	$Music.play()
+	var winner_text
+	if score1 > score2:
+		winner_text = "Guanya el\nJugador 1!"
+	elif score2 > score1:
+		winner_text = "Guanya el\nJugador 2!"
+	else:
+		winner_text = "Empat!"
+	$HUD.show_game_over(winner_text)
 
 func _on_StartTimer_timeout():
 	$MobTimer.start()
 	$ScoreTimer.start()
 
 func _on_ScoreTimer_timeout():
-	score += 1
-	$HUD.update_score(score)
+	if alive1:
+		score1 += 1
+	if alive2:
+		score2 += 1
+	$HUD.update_score(score1, score2)
 
 func _on_MobTimer_timeout():
 	var mob = mob_scene.instance()
@@ -37,7 +64,6 @@ func _on_MobTimer_timeout():
 	mob_spawn_location.offset = randi()
 
 	var direction = mob_spawn_location.rotation + PI / 2
-
 	mob.position = mob_spawn_location.position
 
 	direction += rand_range(-PI / 4, PI / 4)

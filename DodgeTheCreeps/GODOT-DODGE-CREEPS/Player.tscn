@@ -41,4 +41,8 @@ __meta__ = {
 "_edit_group_": true
 }
 
+[node name="StepSound" type="AudioStreamPlayer" parent="."]
+
+[node name="HitSound" type="AudioStreamPlayer" parent="."]
+
 [connection signal="body_entered" from="." to="." method="_on_Player_body_entered"]
