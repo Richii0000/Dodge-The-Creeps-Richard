@@ -8,15 +8,21 @@ var alive2 = false
 
 func _ready():
 	randomize()
+	$HUD.setup(Global.num_players)
 
 func new_game():
 	score1 = 0
 	score2 = 0
 	alive1 = true
-	alive2 = true
+	alive2 = (Global.num_players == 2)
 	get_tree().call_group("mobs", "queue_free")
-	$Player1.start($StartPosition1.position)
-	$Player2.start($StartPosition2.position)
+
+	if Global.num_players == 1:
+		$Player1.start(Vector2(240, 450))
+	else:
+		$Player1.start($StartPosition1.position)
+		$Player2.start($StartPosition2.position)
+
 	$StartTimer.start()
 	$HUD.update_score(score1, score2)
 	$HUD.show_message("Get Ready")
@@ -37,14 +43,16 @@ func game_over():
 	$Music.stop()
 	$DeathSound.play()
 
-	var winner_text
-	if score1 > score2:
-		winner_text = "Guanya el\nJugador 1!"
+	var result_text
+	if Global.num_players == 1:
+		result_text = "Score:\n" + str(score1)
+	elif score1 > score2:
+		result_text = "Guanya el\nJugador 1!"
 	elif score2 > score1:
-		winner_text = "Guanya el\nJugador 2!"
+		result_text = "Guanya el\nJugador 2!"
 	else:
-		winner_text = "Empat!"
-	$HUD.show_game_over(winner_text)
+		result_text = "Empat!"
+	$HUD.show_game_over(result_text)
 
 func _on_StartTimer_timeout():
 	$MobTimer.start()
