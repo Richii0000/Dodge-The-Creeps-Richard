@@ -6,9 +6,33 @@ var score2 = 0
 var alive1 = false
 var alive2 = false
 
+var mob_min_speed = 150.0
+var mob_max_speed = 250.0
+
 func _ready():
 	randomize()
 	$HUD.setup(Global.num_players)
+	apply_difficulty()
+
+func apply_difficulty():
+	match Global.difficulty:
+		0:  # Fàcil
+			$MobTimer.wait_time = 0.8
+			mob_min_speed = 100.0
+			mob_max_speed = 180.0
+		1:  # Normal
+			$MobTimer.wait_time = 0.5
+			mob_min_speed = 150.0
+			mob_max_speed = 250.0
+		2:  # Difícil
+			$MobTimer.wait_time = 0.3
+			mob_min_speed = 220.0
+			mob_max_speed = 350.0
+
+func _unhandled_input(event):
+	# Con Escape vuelves al menú (útil sobre todo en modo Zen)
+	if event.is_action_pressed("ui_cancel"):
+		get_tree().change_scene("res://MainMenu.tscn")
 
 func new_game():
 	score1 = 0
@@ -25,7 +49,10 @@ func new_game():
 
 	$StartTimer.start()
 	$HUD.update_score(score1, score2)
-	$HUD.show_message("Get Ready")
+	if Global.zen_mode:
+		$HUD.show_message("Mode Zen")
+	else:
+		$HUD.show_message("Get Ready")
 	$Music.play()
 
 func _on_player_hit(player_id):
@@ -59,6 +86,8 @@ func _on_StartTimer_timeout():
 	$ScoreTimer.start()
 
 func _on_ScoreTimer_timeout():
+	if Global.zen_mode:
+		return  # En modo Zen no hay puntuación
 	if alive1:
 		score1 += 1
 	if alive2:
@@ -77,7 +106,7 @@ func _on_MobTimer_timeout():
 	direction += rand_range(-PI / 4, PI / 4)
 	mob.rotation = direction
 
-	var velocity = Vector2(rand_range(150.0, 250.0), 0.0)
+	var velocity = Vector2(rand_range(mob_min_speed, mob_max_speed), 0.0)
 	mob.linear_velocity = velocity.rotated(direction)
 
 	add_child(mob)

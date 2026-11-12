@@ -67,7 +67,6 @@ text = "Online multiplayer"
 margin_top = 247.0
 margin_right = 400.0
 margin_bottom = 292.0
-disabled = true
 text = "Settings"
 
 [node name="HighscoresButton" type="Button" parent="Buttons"]
@@ -86,3 +85,4 @@ text = "About"
 
 [connection signal="pressed" from="Buttons/SinglePlayerButton" to="." method="_on_SinglePlayerButton_pressed"]
 [connection signal="pressed" from="Buttons/LocalMultiButton" to="." method="_on_LocalMultiButton_pressed"]
+[connection signal="pressed" from="Buttons/SettingsButton" to="." method="_on_SettingsButton_pressed"]

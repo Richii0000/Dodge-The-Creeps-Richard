@@ -6,7 +6,8 @@ var num_players = 2
 
 func setup(players):
 	num_players = players
-	$ScoreLabel2.visible = (players == 2)
+	$ScoreLabel1.visible = not Global.zen_mode
+	$ScoreLabel2.visible = (players == 2) and not Global.zen_mode
 
 func show_message(text):
 	$Message.text = text
